@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE muclient>
-<!-- Saved on Wednesday, April 27, 2016, 11:40 AM -->
+<!-- Saved on Wednesday, April 27, 2016, 4:12 PM -->
 <!-- MuClient version 5.01 -->
 <!-- Written by Nick Gammon -->
 <!-- Home Page: http://www.mushclient.com/ -->
@@ -8,7 +8,7 @@
 <world
    muclient_version="5.01"
    world_file_version="15"
-   date_saved="2016-04-27 11:40:28"
+   date_saved="2016-04-27 16:12:35"
 
    auto_say_override_prefix="-"
    auto_say_string="say "
@@ -107,7 +107,7 @@
 <triggers
    muclient_version="5.01"
    world_file_version="15"
-   date_saved="2016-04-27 11:40:28"
+   date_saved="2016-04-27 16:12:35"
   >
 </triggers>
 
@@ -116,7 +116,7 @@
 <aliases
    muclient_version="5.01"
    world_file_version="15"
-   date_saved="2016-04-27 11:40:28"
+   date_saved="2016-04-27 16:12:35"
   >
 </aliases>
 
@@ -125,7 +125,7 @@
 <timers
    muclient_version="5.01"
    world_file_version="15"
-   date_saved="2016-04-27 11:40:28"
+   date_saved="2016-04-27 16:12:35"
   >
 </timers>
 
@@ -134,7 +134,7 @@
 <macros
    muclient_version="5.01"
    world_file_version="15"
-   date_saved="2016-04-27 11:40:28"
+   date_saved="2016-04-27 16:12:35"
   >
 
   <macro name="up" type="send_now" >
@@ -228,8 +228,9 @@
 <variables
    muclient_version="5.01"
    world_file_version="15"
-   date_saved="2016-04-27 11:40:28"
+   date_saved="2016-04-27 16:12:35"
   >
+  <variable name="MSDPDebug">1</variable>
 </variables>
 
 <!-- colours -->
@@ -237,7 +238,7 @@
 <colours
    muclient_version="5.01"
    world_file_version="15"
-   date_saved="2016-04-27 11:40:28"
+   date_saved="2016-04-27 16:12:35"
   >
 
 <ansi>
@@ -294,7 +295,7 @@
 <keypad
    muclient_version="5.01"
    world_file_version="15"
-   date_saved="2016-04-27 11:40:28"
+   date_saved="2016-04-27 16:12:35"
   >
 
   <key name="0" >
@@ -408,7 +409,7 @@
 <printing
    muclient_version="5.01"
    world_file_version="15"
-   date_saved="2016-04-27 11:40:28"
+   date_saved="2016-04-27 16:12:35"
   >
 
 <ansi>
@@ -431,4 +432,7 @@
 
 </ansi>
 </printing>
+
+<!-- plugins -->
+<include name="MSDP_handler.xml" plugin="y" />
 </muclient>

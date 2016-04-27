@@ -26,12 +26,145 @@
 
 <!--  Script  -->
 
+<aliases>
+   <alias script="msdpdebug" match="^msdpdebug (.*)$" enabled="y" regexp="y" send_to="12" sequence="100"></alias>
+</aliases>
 
 <script>
 <![CDATA[
-# add something
+
+require "json"
+
+local NUL, IAC, SB, SE, DO = 0x00, 0xFF, 0xFA, 0xF0, 0xFD
+
+local MSDP = 69
+
+local MSDP_VAR = 1
+local MSDP_VAL = 2
+
+local MSDP_TABLE_OPEN = 3
+local MSDP_TABLE_CLOSE = 4
+
+local MSDP_ARRAY_OPEN = 5
+local MSDP_ARRAY_CLOSE = 6
+
+local SPECIAL_CHARS = string.char(NUL) .. string.char(MSDP_VAL) .. string.char(MSDP_VAR) .. string.char(MSDP_TABLE_OPEN) .. string.char(MSDP_TABLE_CLOSE) .. string.char(MSDP_ARRAY_OPEN) .. string.char(MSDP_ARRAY_CLOSE) .. string.char(IAC)
+
+local MSDPDebug = tonumber(GetVariable("MSDPDebug")) or 1
+
+function msdpdebug(name, line, wildcards)
+   newval = tonumber(wildcards[1])
+   if not newval or newval > 2 or newval < 0 then
+      ColourNote("darkorange", "", "MSDPDebug valid values are: 0 - off, 1 - simple, 2 - verbose")
+      return
+   end
+   MSDPDebug = newval
+   local msg = "off"
+   if MSDPDebug == 1 then
+      msg = "simple"
+   elseif MSDPDebug == 2 then
+      msg = "verbose"
+   end
+   ColourNote ("darkorange", "", "MSDPDebug: " .. msg)
+end
+
+---------------------------------------------------------------------------------------------------
+-- Mushclient callback function when telnet SB data received.
+---------------------------------------------------------------------------------------------------
+function OnPluginTelnetSubnegotiation (msg_type, data)
+   if msg_type ~= MSDP then
+      return
+   end -- if not MSDP
+  
+   if MSDPDebug > 0 then
+      dumpmsdp(data)
+   end
+
+   -- convert MSDP request to JSON
+   -- possible combinations:
+   -- 1. Value: <sequence of not IAC (but there might be double IAC), MSDP_TABLE_CLOSE, MSDP_ARRAY_CLOSE> : "<value>"
+   -- 2. Variable: MSDP_VAR <name> MSDP_VAL <Value> : "<name>" : "<value>"
+   -- 3. Table: MSDP_TABLE_OPEN <list of Variables> MSDP_TABLE_CLOSE : {<list of Variables>}
+   -- 4. Array: MSDP_ARRAY_OPEN <list of Values> MSDP_ARRAY_CLOSE : [<list of Values>]
+
+end -- function OnPluginTelnetSubnegotiation
+
+function OnPluginInstall()
+   BroadcastPlugin(1, "reload") -- reload basically tells other plugins "clear all your gmcp data"
+   if IsConnected() then
+      -- pretend like we just logged in
+      OnPluginConnect()
+   end
+end
+
+function OnPluginConnect()
+   Send_MSDP_Packet("request room")
+end
+
+function OnPluginSaveState()
+   SetVariable("MSDPDebug", MSDPDebug)
+end
+
+function OnPluginTelnetRequest (msg_type, data)
+   if msg_type == MSDP and data == "WILL" then
+      return true
+   end -- if
+  
+   if msg_type == MSDP and data == "SENT_DO" then
+      Note ("Enabling MSDP.") 
+      Send_MSDP_Packet(string.char(MSDP_VAR) .. 'REPORT' .. string.char(MSDP_VAL) .. 'ROOM')
+      return true
+   end
+
+   return false
+end -- function OnPluginTelnetRequest
+
+function OnPluginDisable()
+   EnablePlugin(GetPluginID(), true)
+   ColourNote("white", "blue", "You are not allowed to disable the "..
+   GetPluginInfo(GetPluginID(), 1).." plugin. It is necessary for other plugins.")
+end
+
+function getmemoryusage()
+   collectgarbage('collect')
+   return collectgarbage('count')
+end
+
+function dumpmsdp(data)
+   data = data or ""
+   data = string.gsub(
+      string.gsub(
+         string.gsub(
+            string.gsub(
+               string.gsub(
+                  string.gsub(data, string.char(MSDP_VAR), "<MSDP_VAR>"),
+                  string.char(MSDP_VAL), "<MSDP_VAL>"),
+               string.char(MSDP_TABLE_OPEN), "<MSDP_TABLE_OPEN>"),
+            string.char(MSDP_TABLE_CLOSE), "<MSDP_TABLE_CLOSE>"),
+         string.char(MSDP_ARRAY_OPEN), "<MSDP_ARRAY_OPEN>"),
+      string.char(MSDP_ARRAY_CLOSE), "<MSDP_ARRAY_CLOSE>")
+   ColourNote("darkorange", "", data)
+end
+
+function Send_MSDP_Packet (what)
+   assert (what, "Send_MSDP_Packet passed a nil message.")
+   local i = string.find(what, SPECIAL_CHARS)
+   if i == nil then
+      ColourNote("white", "blue", "WARNING: MSDP packet contains prohibited characters")
+   end
+
+   SendPkt (string.char (IAC, SB, MSDP) .. 
+            what ..
+            string.char (IAC, SE))
+end -- Send_MSDP_Packet
+
+function parse_MSDP_request(data)
+end
+
 ]]>
 </script>
 
 
 </muclient>
+
+<!-- vim: set ai ts=3 sw=3 tw=0 et syntax=lua :-->
