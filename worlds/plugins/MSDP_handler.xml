@@ -13,7 +13,7 @@
    language="Lua"
    purpose="Support of MSDP protocol"
    date_written="2016-04-27 11:40:50"
-   requires="5.01"
+   requires="4.94"
    version="1.0"
    >
 
@@ -146,11 +146,39 @@ function dumpmsdp(data)
    ColourNote("darkorange", "", data)
 end
 
+local function get_chars(s)
+  local result = {}
+  local function chars(c) table.insert(result, c) return "" end
+  chars((s:gsub(".", chars)))
+  return result
+end
+
+local function get_codes(s)
+  local result = {}
+  local function chars(c) local n = c:byte(1, 1) table.insert(result, n) return "" end
+  chars((s:gsub(".", chars)))
+  return result
+end
+
+local function strjoin(values, delimiter)
+  local length = table.getn(values)
+  if 0 == length then
+    return ""
+  end
+  
+  local result = values[1]
+  for i = 2, length do
+    result = result .. delimiter .. values[i]
+  end
+  
+  return result
+end
+
 function Send_MSDP_Packet (what)
    assert (what, "Send_MSDP_Packet passed a nil message.")
    local i = string.find(what, SPECIAL_CHARS)
-   if i == nil then
-      ColourNote("white", "blue", "WARNING: MSDP packet contains prohibited characters")
+   if i ~= nil then
+      ColourNote("white", "blue", "WARNING: MSDP packet contains prohibited characters: "..strjoin(get_chars(what), ", "))
    end
 
    SendPkt (string.char (IAC, SB, MSDP) .. 
