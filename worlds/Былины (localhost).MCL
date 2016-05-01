@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE muclient>
-<!-- Saved on Wednesday, April 27, 2016, 4:12 PM -->
-<!-- MuClient version 5.01 -->
+<!-- Saved on ñóááîòà, Àïðåëü 30, 2016, 2:05  -->
+<!-- MuClient version 4.94 -->
 <!-- Written by Nick Gammon -->
 <!-- Home Page: http://www.mushclient.com/ -->
 <muclient>
 <world
-   muclient_version="5.01"
+   muclient_version="4.94"
    world_file_version="15"
-   date_saved="2016-04-27 16:12:35"
+   date_saved="2016-04-30 14:05:55"
 
    auto_say_override_prefix="-"
    auto_say_string="say "
@@ -19,8 +19,8 @@
    mapping_failure="Alas, you cannot go that way."
    name="Áûëèíû (localhost)"
    new_activity_sound="(No sound)"
-   output_font_name="Courier New"
-   script_editor="notepad"
+   output_font_name="Courier"
+   script_editor="C:\Program Files (x86)\Vim\vim74\gvim.exe"
    script_editor_argument="%file"
    script_language="Lua"
    site="localhost"
@@ -43,7 +43,6 @@
    detect_pueblo="y"
    display_my_input="y"
    echo_hyperlink_in_output_window="y"
-   edit_script_with_notepad="y"
    enable_aliases="y"
    enable_beeps="y"
    enable_scripts="y"
@@ -105,36 +104,36 @@
 <!-- triggers -->
 
 <triggers
-   muclient_version="5.01"
+   muclient_version="4.94"
    world_file_version="15"
-   date_saved="2016-04-27 16:12:35"
+   date_saved="2016-04-30 14:05:55"
   >
 </triggers>
 
 <!-- aliases -->
 
 <aliases
-   muclient_version="5.01"
+   muclient_version="4.94"
    world_file_version="15"
-   date_saved="2016-04-27 16:12:35"
+   date_saved="2016-04-30 14:05:55"
   >
 </aliases>
 
 <!-- timers -->
 
 <timers
-   muclient_version="5.01"
+   muclient_version="4.94"
    world_file_version="15"
-   date_saved="2016-04-27 16:12:35"
+   date_saved="2016-04-30 14:05:55"
   >
 </timers>
 
 <!-- macros -->
 
 <macros
-   muclient_version="5.01"
+   muclient_version="4.94"
    world_file_version="15"
-   date_saved="2016-04-27 16:12:35"
+   date_saved="2016-04-30 14:05:55"
   >
 
   <macro name="up" type="send_now" >
@@ -226,19 +225,18 @@
 <!-- variables -->
 
 <variables
-   muclient_version="5.01"
+   muclient_version="4.94"
    world_file_version="15"
-   date_saved="2016-04-27 16:12:35"
+   date_saved="2016-04-30 14:05:55"
   >
-  <variable name="MSDPDebug">1</variable>
 </variables>
 
 <!-- colours -->
 
 <colours
-   muclient_version="5.01"
+   muclient_version="4.94"
    world_file_version="15"
-   date_saved="2016-04-27 16:12:35"
+   date_saved="2016-04-30 14:05:55"
   >
 
 <ansi>
@@ -293,9 +291,9 @@
 <!-- keypad -->
 
 <keypad
-   muclient_version="5.01"
+   muclient_version="4.94"
    world_file_version="15"
-   date_saved="2016-04-27 16:12:35"
+   date_saved="2016-04-30 14:05:55"
   >
 
   <key name="0" >
@@ -407,9 +405,9 @@
 <!-- printing -->
 
 <printing
-   muclient_version="5.01"
+   muclient_version="4.94"
    world_file_version="15"
-   date_saved="2016-04-27 16:12:35"
+   date_saved="2016-04-30 14:05:55"
   >
 
 <ansi>
@@ -434,5 +432,7 @@
 </printing>
 
 <!-- plugins -->
+<include name="PromptHandler.xml" plugin="y" />
+<include name="ga_handler.xml" plugin="y" />
 <include name="MSDP_handler.xml" plugin="y" />
 </muclient>

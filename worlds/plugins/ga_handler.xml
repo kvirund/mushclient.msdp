@@ -26,41 +26,8 @@
 
 <script>
 <![CDATA[
+
 local MSG_PROMPT_FOUND = 1
-
-local function get_chars(s)
-  local result = {}
-  local function chars(c) table.insert(result, c) return "" end
-  chars((s:gsub(".", chars)))
-  return result
-end
-
-local function get_codes(s)
-  local result = {}
-  local function chars(c) local n = c:byte(1, 1) table.insert(result, n) return "" end
-  chars((s:gsub(".", chars)))
-  return result
-end
-
-local function strjoin(values, delimiter)
-  local length = table.getn(values)
-  if 0 == length then
-    return ""
-  end
-  
-  local result = values[1]
-  for i = 2, length do
-    result = result .. delimiter .. values[i]
-  end
-  
-  return result
-end
-
-local function debug(string)
-   local f = assert(io.open("debug.log", "a"))
-   f:write(string.."\n")
-   f:close()
-end
 
 local last_line = ""
 function prompt_found()
@@ -82,7 +49,7 @@ function OnPluginPartialLine(data)
    local count = table.getn(l)
    if 0 ~= count and "" ~= l[count] then
       last_line = l[count]
-      AddTimer("prompt_timer", 0, 0, 0.25, "", timer_flag.Enabled + timer_flag.OneShot + timer_flag.Replace, "prompt_found")
+      AddTimer("prompt_timer", 0, 0, 0.025, "", timer_flag.Enabled + timer_flag.OneShot + timer_flag.Replace, "prompt_found")
    end
 end
 ]]>

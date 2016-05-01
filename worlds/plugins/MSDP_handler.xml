@@ -33,7 +33,7 @@
 <script>
 <![CDATA[
 
-require "json"
+utils = require "common_utils"
 
 local NUL, IAC, SB, SE, DO = 0x00, 0xFF, 0xFA, 0xF0, 0xFD
 
@@ -48,7 +48,7 @@ local MSDP_TABLE_CLOSE = 4
 local MSDP_ARRAY_OPEN = 5
 local MSDP_ARRAY_CLOSE = 6
 
-local SPECIAL_CHARS = string.char(NUL) .. string.char(MSDP_VAL) .. string.char(MSDP_VAR) .. string.char(MSDP_TABLE_OPEN) .. string.char(MSDP_TABLE_CLOSE) .. string.char(MSDP_ARRAY_OPEN) .. string.char(MSDP_ARRAY_CLOSE) .. string.char(IAC)
+local SPECIAL_CHARS = string.char(NUL) .. string.char(MSDP_VAL) .. string.char(MSDP_VAR) .. string.char(MSDP_TABLE_OPEN) .. string.char(MSDP_TABLE_CLOSE) .. string.char(MSDP_ARRAY_OPEN) .. string.char(MSDP_ARRAY_CLOSE)
 
 local MSDPDebug = tonumber(GetVariable("MSDPDebug")) or 1
 
@@ -86,7 +86,7 @@ function OnPluginTelnetSubnegotiation (msg_type, data)
    -- 2. Variable: MSDP_VAR <name> MSDP_VAL <Value> : "<name>" : "<value>"
    -- 3. Table: MSDP_TABLE_OPEN <list of Variables> MSDP_TABLE_CLOSE : {<list of Variables>}
    -- 4. Array: MSDP_ARRAY_OPEN <list of Values> MSDP_ARRAY_CLOSE : [<list of Values>]
-
+   parse_MSDP_request(data)
 end -- function OnPluginTelnetSubnegotiation
 
 function OnPluginInstall()
@@ -125,7 +125,7 @@ function OnPluginDisable()
    GetPluginInfo(GetPluginID(), 1).." plugin. It is necessary for other plugins.")
 end
 
-function getmemoryusage()
+local function getmemoryusage()
    collectgarbage('collect')
    return collectgarbage('count')
 end
@@ -146,39 +146,11 @@ function dumpmsdp(data)
    ColourNote("darkorange", "", data)
 end
 
-local function get_chars(s)
-  local result = {}
-  local function chars(c) table.insert(result, c) return "" end
-  chars((s:gsub(".", chars)))
-  return result
-end
-
-local function get_codes(s)
-  local result = {}
-  local function chars(c) local n = c:byte(1, 1) table.insert(result, n) return "" end
-  chars((s:gsub(".", chars)))
-  return result
-end
-
-local function strjoin(values, delimiter)
-  local length = table.getn(values)
-  if 0 == length then
-    return ""
-  end
-  
-  local result = values[1]
-  for i = 2, length do
-    result = result .. delimiter .. values[i]
-  end
-  
-  return result
-end
-
 function Send_MSDP_Packet (what)
    assert (what, "Send_MSDP_Packet passed a nil message.")
    local i = string.find(what, SPECIAL_CHARS)
    if i ~= nil then
-      ColourNote("white", "blue", "WARNING: MSDP packet contains prohibited characters: "..strjoin(get_chars(what), ", "))
+      ColourNote("white", "blue", "WARNING: MSDP packet contains prohibited characters: "..utils.strjoin(utils.get_chars(what), ", "))
    end
 
    SendPkt (string.char (IAC, SB, MSDP) .. 
@@ -187,6 +159,141 @@ function Send_MSDP_Packet (what)
 end -- Send_MSDP_Packet
 
 function parse_MSDP_request(data)
+   local request = {}
+   
+   local parse_MSDP_variable
+   local parse_MSDP_value
+   
+   local function ParserError(message)
+      print(message)
+   end
+   
+   local function parse_MSDP_array(arg)
+      local result = {}
+      
+      repeat
+         local item = parse_MSDP_variable(arg)
+         if nil == item then
+            return nil
+         end
+         table.insert(result, item)
+      until MSDP_ARRAY_CLOSE == data:byte(arg.from, arg.from)
+      
+      return result
+   end
+   
+   local function parse_MSDP_table(arg)
+      local result = {}
+      
+      repeat
+         local item = parse_MSDP_variable(arg)
+         if nil == item then
+            return nil
+         end
+         for k, v in pairs(item) do
+            result[k] = v
+         end
+      until MSDP_TABLE_CLOSE == data:byte(arg.from, arg.from)
+      
+      return result
+   end
+   
+   function parse_MSDP_value(arg)
+      local data = arg.data
+      local pos = arg.from
+
+      if pos > data:len() then
+         ParserError("MSDP value too small")
+         return nil
+      end
+
+      if MSDP_TABLE_OPEN == data:byte(pos, pos) then
+         local a = {data = data, from = 1 + pos}
+         result = parse_MSDP_table(a)
+         pos = a.from
+      elseif MSDP_ARRAY_OPEN == data:byte(pos, pos) then
+         local a = {data = data, from = 1 + pos}
+         result = parse_MSDP_array(a)
+         pos = a.from
+      else
+         local s = ""
+         while pos <= data:len() do
+            local c = data:sub(pos, pos)
+            
+            if MSDP_ARRAY_CLOSE == data:byte(pos, pos) or MSDP_TABLE_CLOSE == data:byte(pos, pos) or MSDP_VAL == data:byte(pos, pos) or MSDP_VAR == data:byte(pos, pos)then
+               break
+            elseif nil ~= string.find(SPECIAL_CHARS, c) then
+               ParserError("MSDP value contains special characters.")
+               return nil
+            else
+               s = s .. c
+            end
+            
+            pos = pos + 1
+         end
+         
+         if pos > data:len() then
+            ParserError("MSDP value too small")
+            return nil
+         end
+         
+         result = s
+      end
+      
+      arg.from = pos
+      return result
+   end
+   
+   function parse_MSDP_variable(arg)
+      local data = arg.data
+      local pos = arg.from
+      local result = {}
+      
+      if 1 >= data:len() then
+         ParserError("Value too small")
+         return nil
+      end
+      
+      if data:byte(pos, pos) ~= MSDP_VAR then
+         ParserError("MSDP variable does not start from MSDP_VAR. Current character is " .. string.format("\\x%02x", data:byte(pos, pos)))
+         return nil
+      end
+      
+      local name, value = "", nil
+      
+      pos = 1 + pos
+      while pos <= data:len() do
+         local c = data:sub(pos, pos)
+         if string.char(MSDP_VAL) == c then
+            local a = {data = data, from = 1 + pos}
+            value = parse_MSDP_value(a)
+            pos = a.from
+            break
+         elseif nil ~= string.find(SPECIAL_CHARS, c) then
+            ParserError("MSDP variable name contains special characters.")
+            return nil
+         else
+            name = name .. c
+         end
+         pos = pos + 1
+      end
+      
+      if nil == name or nil == value then
+         ParserError("Variable name and variable value are both nil.")
+         return nil
+      end
+      
+      if arg.from == data:len() then
+         ParserError("Unexpected end of value")
+         return nil
+      end
+      
+      arg.from = pos
+      result[name] = value
+      return result
+   end
+
+   return parse_MSDP_variable({data = data, from = 1})
 end
 
 ]]>
