@@ -32,7 +32,7 @@
 function OnPluginBroadcast(msg, id, name, text)
    if id == "fcb2b61b61a4481f9853d8a1" then
       if msg == 1 then
-         Note(text)
+         -- do something with prompt in text
       end
    end
 end
