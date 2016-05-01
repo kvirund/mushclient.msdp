@@ -28,11 +28,13 @@
 
 <aliases>
    <alias script="msdpdebug" match="^msdpdebug (.*)$" enabled="y" regexp="y" send_to="12" sequence="100"></alias>
+   <alias script="msdpdebug" match="^msdpdebug$" enabled="y" regexp="y" send_to="12" sequence="100"></alias>
 </aliases>
 
 <script>
 <![CDATA[
 
+require "serialize"
 utils = require "common_utils"
 
 local NUL, IAC, SB, SE, DO = 0x00, 0xFF, 0xFA, 0xF0, 0xFD
@@ -55,7 +57,10 @@ local MSDPDebug = tonumber(GetVariable("MSDPDebug")) or 1
 function msdpdebug(name, line, wildcards)
    newval = tonumber(wildcards[1])
    if not newval or newval > 2 or newval < 0 then
-      ColourNote("darkorange", "", "MSDPDebug valid values are: 0 - off, 1 - simple, 2 - verbose")
+      ColourNote("darkorange", "", "Usage: msdpdebug {0|1|2}")
+      ColourNote("darkorange", "", "   0 - off")
+      ColourNote("darkorange", "", "   1 - simple")
+      ColourNote("darkorange", "", "   2 - verbose")
       return
    end
    MSDPDebug = newval
@@ -80,17 +85,17 @@ function OnPluginTelnetSubnegotiation (msg_type, data)
       dumpmsdp(data)
    end
 
-   -- convert MSDP request to JSON
-   -- possible combinations:
-   -- 1. Value: <sequence of not IAC (but there might be double IAC), MSDP_TABLE_CLOSE, MSDP_ARRAY_CLOSE> : "<value>"
-   -- 2. Variable: MSDP_VAR <name> MSDP_VAL <Value> : "<name>" : "<value>"
-   -- 3. Table: MSDP_TABLE_OPEN <list of Variables> MSDP_TABLE_CLOSE : {<list of Variables>}
-   -- 4. Array: MSDP_ARRAY_OPEN <list of Values> MSDP_ARRAY_CLOSE : [<list of Values>]
-   parse_MSDP_request(data)
+   request = parse_MSDP_request(data)
+   if nil == request then
+      Note("Failed to parse MSDP request.")
+      return
+   end
+
+   BroadcastPlugin(0, serialize.save("request"))
 end -- function OnPluginTelnetSubnegotiation
 
 function OnPluginInstall()
-   BroadcastPlugin(1, "reload") -- reload basically tells other plugins "clear all your gmcp data"
+   BroadcastPlugin(1, "reload") -- reload basically tells other plugins "clear all your msdp data"
    if IsConnected() then
       -- pretend like we just logged in
       OnPluginConnect()
@@ -165,7 +170,7 @@ function parse_MSDP_request(data)
    local parse_MSDP_value
    
    local function ParserError(message)
-      print(message)
+      Note(message)
    end
    
    local function parse_MSDP_array(arg)
