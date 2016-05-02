@@ -126,7 +126,8 @@ function load_rooms()
 			bordercolour = 0xffffff,
 			name = row.name,
 			exits = {e = row.east, w = row.west, n = row.north, s = row.south, u = row.up, d = row.down},
-			area = row.area
+			area = row.area,
+			terrain = row.terrain
 		}
 	end
 end
@@ -198,7 +199,8 @@ function OnPluginBroadcast(msg, id, name, text)
 				bordercolour = 0xffffff,
 				name = room.NAME,
 				exits = exits,
-				area = room.AREA
+				area = room.AREA,
+				terrain = room.TERRAIN
 			}
 			rooms[VNUM] = mapper_room
 			current_room_vnum = VNUM
