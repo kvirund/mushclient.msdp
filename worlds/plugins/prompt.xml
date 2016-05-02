@@ -7,7 +7,7 @@
 
 <muclient>
 <plugin
-   name="ga_handler"
+   name="prompt"
    author="Anton Gorev"
    id="fcb2b61b61a4481f9853d8a1"
    language="Lua"

@@ -52,7 +52,7 @@ local MSDP_ARRAY_CLOSE = 6
 
 local SPECIAL_CHARS = string.char(NUL) .. string.char(MSDP_VAL) .. string.char(MSDP_VAR) .. string.char(MSDP_TABLE_OPEN) .. string.char(MSDP_TABLE_CLOSE) .. string.char(MSDP_ARRAY_OPEN) .. string.char(MSDP_ARRAY_CLOSE)
 
-local MSDPDebug = tonumber(GetVariable("MSDPDebug")) or 1
+local MSDPDebug = tonumber(GetVariable("MSDPDebug")) or 0
 
 function msdpdebug(name, line, wildcards)
    newval = tonumber(wildcards[1])
@@ -91,7 +91,9 @@ function OnPluginTelnetSubnegotiation (msg_type, data)
       return
    end
 
-   BroadcastPlugin(0, serialize.save("request"))
+   if nil ~= request.ROOM then
+      BroadcastPlugin(1, serialize.save("room", request.ROOM))
+   end
 end -- function OnPluginTelnetSubnegotiation
 
 function OnPluginInstall()

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE muclient>
-<!-- Saved on ñóááîòà, Àïðåëü 30, 2016, 2:05  -->
+<!-- Saved on âîñêðåñåíüå, Ìàé 01, 2016, 8:59  -->
 <!-- MuClient version 4.94 -->
 <!-- Written by Nick Gammon -->
 <!-- Home Page: http://www.mushclient.com/ -->
@@ -8,13 +8,13 @@
 <world
    muclient_version="4.94"
    world_file_version="15"
-   date_saved="2016-04-30 14:05:55"
+   date_saved="2016-05-01 20:59:08"
 
    auto_say_override_prefix="-"
    auto_say_string="say "
    chat_name="Name-not-set"
    command_stack_character=";"
-   id="a12315dff94696446824da13"
+   id="62036115587c95b8f311d0aa"
    input_font_name="Courier New"
    mapping_failure="Alas, you cannot go that way."
    name="Áûëèíû (localhost)"
@@ -106,7 +106,7 @@
 <triggers
    muclient_version="4.94"
    world_file_version="15"
-   date_saved="2016-04-30 14:05:55"
+   date_saved="2016-05-01 20:59:08"
   >
 </triggers>
 
@@ -115,7 +115,7 @@
 <aliases
    muclient_version="4.94"
    world_file_version="15"
-   date_saved="2016-04-30 14:05:55"
+   date_saved="2016-05-01 20:59:08"
   >
 </aliases>
 
@@ -124,7 +124,7 @@
 <timers
    muclient_version="4.94"
    world_file_version="15"
-   date_saved="2016-04-30 14:05:55"
+   date_saved="2016-05-01 20:59:08"
   >
 </timers>
 
@@ -133,7 +133,7 @@
 <macros
    muclient_version="4.94"
    world_file_version="15"
-   date_saved="2016-04-30 14:05:55"
+   date_saved="2016-05-01 20:59:08"
   >
 
   <macro name="up" type="send_now" >
@@ -227,7 +227,7 @@
 <variables
    muclient_version="4.94"
    world_file_version="15"
-   date_saved="2016-04-30 14:05:55"
+   date_saved="2016-05-01 20:59:08"
   >
 </variables>
 
@@ -236,7 +236,7 @@
 <colours
    muclient_version="4.94"
    world_file_version="15"
-   date_saved="2016-04-30 14:05:55"
+   date_saved="2016-05-01 20:59:08"
   >
 
 <ansi>
@@ -293,7 +293,7 @@
 <keypad
    muclient_version="4.94"
    world_file_version="15"
-   date_saved="2016-04-30 14:05:55"
+   date_saved="2016-05-01 20:59:08"
   >
 
   <key name="0" >
@@ -407,7 +407,7 @@
 <printing
    muclient_version="4.94"
    world_file_version="15"
-   date_saved="2016-04-30 14:05:55"
+   date_saved="2016-05-01 20:59:08"
   >
 
 <ansi>
@@ -433,6 +433,7 @@
 
 <!-- plugins -->
 <include name="PromptHandler.xml" plugin="y" />
-<include name="ga_handler.xml" plugin="y" />
+<include name="prompt.xml" plugin="y" />
 <include name="MSDP_handler.xml" plugin="y" />
+<include name="MSDP_mapper.xml" plugin="y" />
 </muclient>
