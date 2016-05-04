@@ -104,10 +104,6 @@ function OnPluginInstall()
    end
 end
 
-function OnPluginConnect()
-   Send_MSDP_Packet("request room")
-end
-
 function OnPluginSaveState()
    SetVariable("MSDPDebug", MSDPDebug)
 end
