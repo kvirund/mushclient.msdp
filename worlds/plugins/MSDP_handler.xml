@@ -235,11 +235,6 @@ function parse_MSDP_request(data)
             pos = pos + 1
          end
          
-         if pos > data:len() then
-            ParserError("MSDP value too small")
-            return nil
-         end
-         
          result = s
       end
       
@@ -282,7 +277,7 @@ function parse_MSDP_request(data)
       end
       
       if nil == name or nil == value then
-         ParserError("Variable name and variable value are both nil.")
+         ParserError("Either variable name or variable value is nil.")
          return nil
       end
       
